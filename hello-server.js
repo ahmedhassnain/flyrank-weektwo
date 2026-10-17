@@ -37,13 +37,40 @@ server.get('/tasks/:id', (req, res) => {
 })
 
 server.post('/tasks', (req, res) => {
+
+    if (!req.body.title) {
+        return res.status(400).json({ error: "The title is missing."})
+    }
+
     const newTodoItem = {
         id: Math.max(...taskList.map((eachItem) => eachItem.id)) + 1,
         title: req.body.title,
         done: false
     }
     taskList.push(newTodoItem);
-    res.status(200).json({ message: "New Item Added" })
+    res.status(201).json({ message: "New Item Added" })
+})
+
+server.put('/tasks/:id', (req, res) => {
+    const chosenId = Number(req.params.id);
+    const selectedItem = taskList.find((eachItem) => eachItem.id === chosenId);
+    if (!selectedItem) {
+        return res.status(404).json({ error: "The item does not exist."})
+    }
+    taskList = taskList.map((eachItem) => {
+       return eachItem.id === chosenId ? {...eachItem, title: req.body.title, done: req.body.done} : eachItem;
+    })
+    res.status(200).json({ message: "Item updated. "})
+})
+
+server.delete('/tasks/:id', (req, res) => {
+    const chosenId = Number(req.params.id);
+    const selectedItem = taskList.find((eachItem) => eachItem.id === chosenId);
+    if (!selectedItem) {
+        return res.status(404).json({ error: "The item does not exist."})
+    }
+    taskList = taskList.filter((eachItem) => eachItem.id !== chosenId);
+    res.status(200).json({ message: "Item removed. "})
 })
 
 const PORT = 3000;
