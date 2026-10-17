@@ -1,7 +1,8 @@
 import express from 'express'
 const server = express();
+server.use(express.json())
 
-const taskList = [
+let taskList = [
     {id: 1, title: "Wake up in the morning", done: true},
     {id: 2, title: "Go to university", done: false},
     {id: 3, title: "Program in Node.JS", done: false},
@@ -33,6 +34,16 @@ server.get('/tasks/:id', (req, res) => {
     }
 
     res.json(selectedItem)
+})
+
+server.post('/tasks', (req, res) => {
+    const newTodoItem = {
+        id: Math.max(...taskList.map((eachItem) => eachItem.id)) + 1,
+        title: req.body.title,
+        done: false
+    }
+    taskList.push(newTodoItem);
+    res.status(200).json({ message: "New Item Added" })
 })
 
 const PORT = 3000;
